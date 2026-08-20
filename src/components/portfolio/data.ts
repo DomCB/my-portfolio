@@ -169,9 +169,11 @@ export const skills = [
   { label: "Other", items: "Driver signing, SQL data verification, hardware & software troubleshooting" },
 ];
 
-export const stats = [
+export type Stat = { value: string; label: string; chart?: string };
+
+export const stats: Stat[] = [
   { value: "3+", label: "Years in QA" },
   { value: "iOS + Android", label: "Mobile coverage" },
-  { value: "Solo QA", label: "Product team owner" },
+  { value: "Bug Hunter", label: "195+ bugs filed (and counting)", chart: "/bugs_by_project_pie.html" },
   { value: "17,680+", label: "Users supported" },
 ];

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bugs Filed by Project — Dom</title>
+<style>
+  :root { color-scheme: light dark; }
+  .viz-root {
+    color-scheme: light;
+    --surface-1:      #fcfcfb;
+    --page-plane:     #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --gridline:       #e1e0d9;
+    --border:         rgba(11,11,11,0.10);
+    --series-1: #2a78d6; /* blue   - AnytimeMailbox2.0 */
+    --series-2: #eb6834; /* orange - Anytime Tech */
+    --series-3: #1baf7a; /* aqua   - QA Sandbox */
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) .viz-root {
+      color-scheme: dark;
+      --surface-1:      #1a1a19;
+      --page-plane:     #0d0d0d;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --gridline:       #2c2c2a;
+      --border:         rgba(255,255,255,0.10);
+      --series-1: #3987e5;
+      --series-2: #d95926;
+      --series-3: #199e70;
+    }
+  }
+  :root[data-theme="dark"] .viz-root {
+    color-scheme: dark;
+    --surface-1:      #1a1a19;
+    --page-plane:     #0d0d0d;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted:     #898781;
+    --gridline:       #2c2c2a;
+    --border:         rgba(255,255,255,0.10);
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --series-3: #199e70;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--page-plane);
+    color: var(--text-primary);
+  }
+  .viz-root {
+    max-width: 620px;
+    margin: 32px auto;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 32px 24px;
+  }
+  .header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 4px; }
+  h1 { font-size: 18px; font-weight: 600; margin: 0 0 4px; }
+  .subtitle { font-size: 13px; color: var(--text-secondary); margin: 0; }
+  .toggle-btn {
+    font-family: inherit;
+    font-size: 12px;
+    color: var(--text-secondary);
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 10px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .toggle-btn:hover { color: var(--text-primary); border-color: var(--text-muted); }
+
+  .chart-body {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+  .pie-wrap { position: relative; flex-shrink: 0; }
+  svg.pie { display: block; }
+  .slice { stroke: var(--surface-1); stroke-width: 2; transition: filter 0.15s ease, transform 0.15s ease; transform-origin: 130px 130px; cursor: pointer; }
+  .slice:hover { filter: brightness(1.08); }
+  .slice-label {
+    font-size: 13px;
+    font-weight: 600;
+    fill: #ffffff;
+    text-anchor: middle;
+    dominant-baseline: middle;
+    pointer-events: none;
+  }
+
+  .legend { display: flex; flex-direction: column; gap: 10px; min-width: 200px; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-secondary); }
+  .swatch { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+  .legend-label { color: var(--text-primary); }
+  .legend-value { margin-left: auto; font-variant-numeric: tabular-nums; color: var(--text-secondary); padding-left: 12px; }
+
+  .tooltip {
+    position: absolute;
+    background: var(--text-primary);
+    color: var(--surface-1);
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.1s ease;
+    white-space: nowrap;
+    transform: translate(-50%, -130%);
+    z-index: 10;
+  }
+  .tooltip.visible { opacity: 1; }
+
+  table.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-top: 20px;
+  }
+  table.data-table th, table.data-table td {
+    text-align: left;
+    padding: 8px 6px;
+    border-bottom: 1px solid var(--gridline);
+  }
+  table.data-table th { color: var(--text-secondary); font-weight: 600; }
+  table.data-table td.num { font-variant-numeric: tabular-nums; text-align: right; }
+  .hidden { display: none; }
+
+  .footnote { font-size: 11px; color: var(--text-muted); margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<div class="viz-root">
+  <div class="header">
+    <div>
+      <h1>Bugs filed by Dom, by project</h1>
+      <p class="subtitle">195 bugs total across the bugocorp organization &middot; queried Aug 20, 2026</p>
+    </div>
+    <button class="toggle-btn" id="toggleBtn">View as table</button>
+  </div>
+
+  <div class="chart-body" id="chartView">
+    <div class="pie-wrap">
+      <svg class="pie" width="260" height="260" viewBox="0 0 260 260" id="pieSvg"></svg>
+      <div class="tooltip" id="tooltip"></div>
+    </div>
+    <div class="legend" id="legend"></div>
+  </div>
+
+  <table class="data-table hidden" id="tableView">
+    <thead>
+      <tr><th>Project</th><th style="text-align:right;">Bugs filed</th><th style="text-align:right;">Share</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>AnytimeMailbox2.0</td><td class="num">135</td><td class="num">69%</td></tr>
+      <tr><td>Anytime Tech</td><td class="num">59</td><td class="num">30%</td></tr>
+      <tr><td>QA Sandbox</td><td class="num">1</td><td class="num">1%</td></tr>
+      <tr style="font-weight:600;"><td>Total</td><td class="num">195</td><td class="num">100%</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  const data = [
+    { label: 'AnytimeMailbox2.0', value: 135, colorVar: '--series-1' },
+    { label: 'Anytime Tech',      value: 59,  colorVar: '--series-2' },
+    { label: 'QA Sandbox',        value: 1,   colorVar: '--series-3' },
+  ];
+  const total = data.reduce((s, d) => s + d.value, 0);
+
+  const cx = 130, cy = 130, r = 118;
+  const root = document.querySelector('.viz-root');
+  const styles = getComputedStyle(root);
+  const colorFor = (v) => styles.getPropertyValue(v).trim();
+
+  function polar(cx, cy, r, angleDeg) {
+    const rad = (angleDeg - 90) * Math.PI / 180;
+    return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+  }
+
+  const svg = document.getElementById('pieSvg');
+  const legend = document.getElementById('legend');
+  const tooltip = document.getElementById('tooltip');
+
+  let cumulative = 0;
+  data.forEach((d, i) => {
+    const pct = d.value / total;
+    const startAngle = cumulative * 360;
+    const endAngle = (cumulative + pct) * 360;
+    cumulative += pct;
+
+    const start = polar(cx, cy, r, startAngle);
+    const end = polar(cx, cy, r, endAngle);
+    const largeArc = (endAngle - startAngle) > 180 ? 1 : 0;
+    const path = `M ${cx} ${cy} L ${start.x.toFixed(2)} ${start.y.toFixed(2)} A ${r} ${r} 0 ${largeArc} 1 ${end.x.toFixed(2)} ${end.y.toFixed(2)} Z`;
+
+    const el = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    el.setAttribute('d', path);
+    el.setAttribute('class', 'slice');
+    el.setAttribute('fill', colorFor(d.colorVar));
+    svg.appendChild(el);
+
+    // Direct label only if the slice is wide enough to hold text comfortably (>= 8%)
+    if (pct >= 0.08) {
+      const midAngle = startAngle + (endAngle - startAngle) / 2;
+      const labelPos = polar(cx, cy, r * 0.62, midAngle);
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.setAttribute('x', labelPos.x.toFixed(2));
+      text.setAttribute('y', labelPos.y.toFixed(2));
+      text.setAttribute('class', 'slice-label');
+      text.textContent = Math.round(pct * 100) + '%';
+      svg.appendChild(text);
+    }
+
+    const pctLabel = pct < 0.01 ? '<1%' : Math.round(pct * 100) + '%';
+
+    el.addEventListener('mousemove', (e) => {
+      const rect = root.getBoundingClientRect();
+      tooltip.textContent = `${d.label}: ${d.value} bugs (${pctLabel})`;
+      tooltip.style.left = (e.clientX - rect.left) + 'px';
+      tooltip.style.top = (e.clientY - rect.top) + 'px';
+      tooltip.classList.add('visible');
+    });
+    el.addEventListener('mouseleave', () => tooltip.classList.remove('visible'));
+
+    const item = document.createElement('div');
+    item.className = 'legend-item';
+    item.innerHTML = `<span class="swatch" style="background:${colorFor(d.colorVar)}"></span><span class="legend-label">${d.label}</span><span class="legend-value">${d.value} &middot; ${pctLabel}</span>`;
+    legend.appendChild(item);
+  });
+
+  const toggleBtn = document.getElementById('toggleBtn');
+  const chartView = document.getElementById('chartView');
+  const tableView = document.getElementById('tableView');
+  let showingTable = false;
+  toggleBtn.addEventListener('click', () => {
+    showingTable = !showingTable;
+    chartView.classList.toggle('hidden', showingTable);
+    tableView.classList.toggle('hidden', !showingTable);
+    toggleBtn.textContent = showingTable ? 'View as chart' : 'View as table';
+  });
+</script>
+
+</body>
+</html>

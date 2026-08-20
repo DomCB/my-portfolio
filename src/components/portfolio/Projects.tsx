@@ -1,5 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { projects, type Project } from "./data";
+
+// useLayoutEffect warns during SSR; fall back to useEffect on the server.
+const useIsoLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 const categories = ["n8n", "Zapier", "Make.com", "GoHighLevel"] as const;
 
@@ -135,12 +138,20 @@ function ProjectLightbox({ project, onClose }: { project: Project; onClose: () =
             ref={imgRef}
             src={project.image}
             alt={project.title}
-            onMouseMove={(e) => {
+            onPointerMove={(e) => {
               const rect = e.currentTarget.getBoundingClientRect();
               setLens({ x: e.clientX - rect.left, y: e.clientY - rect.top, width: rect.width, height: rect.height });
             }}
-            onMouseLeave={() => setLens(null)}
-            className="max-h-[78vh] w-auto max-w-full cursor-crosshair border border-ring object-contain"
+            onPointerDown={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              setLens({ x: e.clientX - rect.left, y: e.clientY - rect.top, width: rect.width, height: rect.height });
+            }}
+            onPointerUp={(e) => {
+              if (e.pointerType !== "mouse") setLens(null);
+            }}
+            onPointerLeave={() => setLens(null)}
+            onPointerCancel={() => setLens(null)}
+            className="max-h-[78vh] w-auto max-w-full cursor-crosshair touch-none border border-ring object-contain"
             style={{ boxShadow: "var(--shadow-gold)" }}
           />
           {lens && (
@@ -174,17 +185,68 @@ export function Projects() {
   const [category, setCategory] = useState<(typeof categories)[number]>("n8n");
   const [active, setActive] = useState<Project | null>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  // After a tab change, where to land the scroller: fresh tab starts at the left,
+  // a tab entered by pressing left (from the next tab) starts at its right end.
+  const pendingScroll = useRef<"start" | "end" | null>(null);
 
   const filtered = projects.filter((p) => p.category === category);
 
-  const scroll = (direction: 1 | -1) => {
+  // Move within the current tab's cards; at the edge, jump to the adjacent tab (looping).
+  const navigate = (direction: 1 | -1) => {
     const el = scrollerRef.current;
     if (!el) return;
-    el.scrollBy({ left: direction * Math.min(el.clientWidth * 0.9, 680), behavior: "smooth" });
+    const remaining =
+      direction === 1 ? el.scrollWidth - el.clientWidth - el.scrollLeft : el.scrollLeft;
+    if (remaining > 8) {
+      el.scrollBy({ left: direction * Math.min(el.clientWidth * 0.9, 680), behavior: "smooth" });
+      return;
+    }
+    const idx = categories.indexOf(category);
+    const nextIdx = (idx + direction + categories.length) % categories.length;
+    pendingScroll.current = direction === 1 ? "start" : "end";
+    setCategory(categories[nextIdx]);
   };
 
+  // Position the scroller instantly after a tab change (no smooth animation across content).
+  useIsoLayoutEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const prev = el.style.scrollBehavior;
+    el.style.scrollBehavior = "auto";
+    el.scrollLeft = pendingScroll.current === "end" ? el.scrollWidth - el.clientWidth : 0;
+    el.style.scrollBehavior = prev;
+    pendingScroll.current = null;
+  }, [category]);
+
+  // Keyboard ← / → drive the carousel when it is on screen (and no lightbox is open).
+  const navRef = useRef(navigate);
+  const activeRef = useRef(active);
+  useEffect(() => {
+    navRef.current = navigate;
+    activeRef.current = active;
+  });
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      if (activeRef.current) return;
+      const ae = document.activeElement as HTMLElement | null;
+      if (ae && (ae.tagName === "INPUT" || ae.tagName === "TEXTAREA" || ae.tagName === "SELECT" || ae.isContentEditable)) {
+        return;
+      }
+      const sec = sectionRef.current;
+      if (!sec) return;
+      const r = sec.getBoundingClientRect();
+      if (r.bottom <= 0 || r.top >= window.innerHeight) return; // not on screen
+      e.preventDefault();
+      navRef.current(e.key === "ArrowRight" ? 1 : -1);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   return (
-    <div>
+    <div ref={sectionRef}>
       <div className="mb-8 flex flex-wrap items-center justify-between gap-6">
         <div className="flex flex-wrap gap-2">
           {categories.map((cat) => {
@@ -211,16 +273,16 @@ export function Projects() {
         <div className="flex gap-2">
           <button
             type="button"
-            onClick={() => scroll(-1)}
-            aria-label="Scroll projects left"
+            onClick={() => navigate(-1)}
+            aria-label="Previous projects"
             className="shine font-display grid size-10 place-items-center border border-ring text-primary transition-colors hover:bg-accent"
           >
             ‹
           </button>
           <button
             type="button"
-            onClick={() => scroll(1)}
-            aria-label="Scroll projects right"
+            onClick={() => navigate(1)}
+            aria-label="Next projects"
             className="shine font-display grid size-10 place-items-center border border-ring text-primary transition-colors hover:bg-accent"
           >
             ›

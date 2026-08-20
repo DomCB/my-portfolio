@@ -4,6 +4,7 @@ import type { MouseEvent } from "react";
 import portrait from "@/assets/hero-photo.jpg";
 import { experience, skills, stats } from "@/components/portfolio/data";
 import { ToolChip } from "@/components/portfolio/ToolChip";
+import { StatCell } from "@/components/portfolio/StatCell";
 import { ThemeToggle } from "@/components/portfolio/ThemeToggle";
 import { Projects } from "@/components/portfolio/Projects";
 
@@ -182,16 +183,16 @@ function Index() {
 
         <div className="relative h-[420px] [animation:soften_1.3s_ease_both] md:h-[600px]">
           <div
-            className="absolute top-[10%] left-1/2 aspect-square w-[64%] -translate-x-1/2 rounded-full [animation:breathe_8s_ease-in-out_infinite]"
+            className="absolute top-[10%] left-1/2 aspect-square w-[64%] -translate-x-1/2 rounded-full [animation:breathe_8s_ease-in-out_infinite] md:max-w-[300px]"
             style={{
               background:
                 "radial-gradient(circle at 46% 38%, color-mix(in oklab, var(--glow) 24%, transparent), color-mix(in oklab, var(--glow) 7%, transparent) 55%, transparent 76%)",
             }}
           />
-          <div className="absolute top-[6%] left-[55%] h-[88%] w-[62%] -translate-x-1/2 rounded-t-[999px] border border-border bg-surface md:w-[52%]" />
-          <div className="absolute top-0 left-[45%] h-[94%] w-[70%] -translate-x-1/2 rounded-t-[999px] border border-ring md:w-[60%]" />
+          <div className="absolute top-[6%] left-[55%] h-[88%] w-[62%] -translate-x-1/2 rounded-t-[999px] border border-border bg-surface md:w-[52%] md:max-w-[250px]" />
+          <div className="absolute top-0 left-[45%] h-[94%] w-[70%] -translate-x-1/2 rounded-t-[999px] border border-ring md:w-[60%] md:max-w-[290px]" />
           <div
-            className="absolute bottom-0 left-1/2 h-[86%] w-[54%] -translate-x-1/2 overflow-hidden rounded-t-[999px] border border-ring md:w-[46%]"
+            className="absolute bottom-0 left-1/2 h-[86%] w-[54%] -translate-x-1/2 overflow-hidden rounded-t-[999px] border border-ring md:w-[46%] md:max-w-[220px]"
             style={{ boxShadow: "var(--shadow-gold)" }}
           >
             <img
@@ -205,14 +206,7 @@ function Index() {
 
       <section className="grid border-y border-border bg-surface sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
-          <div key={stat.label} className="border-b border-border px-8 py-8 last:border-b-0 lg:border-r lg:border-b-0">
-            <div className="font-display text-[clamp(1.6rem,2.4vw,2.4rem)] leading-none font-extralight tracking-tight text-primary">
-              {stat.value}
-            </div>
-            <div className="font-display mt-3 text-[10.5px] tracking-[0.22em] text-muted-foreground uppercase">
-              {stat.label}
-            </div>
-          </div>
+          <StatCell key={stat.label} stat={stat} />
         ))}
       </section>
 
@@ -267,7 +261,7 @@ function Index() {
               </div>
               <p className="mt-5 max-w-3xl text-[15px] leading-relaxed text-foreground/80">{job.summary}</p>
               <div className="font-display mt-6 text-[10px] tracking-[0.2em] text-muted-foreground uppercase">
-                Tools &amp; skills — hover for detail
+                Tools &amp; skills — hover or tap for detail
               </div>
               <div className="mt-3 flex flex-wrap gap-2">
                 {job.tools.map((tool) => (
