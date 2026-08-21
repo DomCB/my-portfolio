@@ -262,16 +262,16 @@
 }
 
 /*
- * Glass-shine that sweeps on its own once every 3 minutes (no hover needed) —
- * the same specular streak as the tool/skill chips, but self-triggering. The
- * streak plays across the first ~0.85s of the 180s cycle, then rests until the
- * next cycle.
+ * Glass-shine that sweeps on its own every 3 seconds (no hover needed) — the
+ * same specular streak as the tool/skill chips, but self-triggering. The streak
+ * eases across the first ~0.85s of each 3s cycle, then rests until the next.
  */
 @keyframes shine-auto-sweep {
   0% {
     transform: translateX(-135%);
+    animation-timing-function: cubic-bezier(0.22, 0.68, 0.24, 1);
   }
-  0.47%,
+  28%,
   100% {
     transform: translateX(135%);
   }
@@ -294,13 +294,7 @@
       transparent 74%
     );
     transform: translateX(-135%);
-    animation: shine-auto-sweep 180s linear infinite;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .shine-auto::after {
-    animation: none;
+    animation: shine-auto-sweep 3s linear infinite;
   }
 }
 
