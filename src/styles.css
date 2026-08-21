@@ -335,12 +335,6 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-new(root) {
-    animation-duration: 0.01s;
-  }
-}
-
 @layer base {
   * {
     border-color: var(--color-border);

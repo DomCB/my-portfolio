@@ -335,7 +335,6 @@ function Index() {
           href="#contact"
           onClick={handleAnchorClick}
           className="shine-auto font-display border border-ring bg-surface/90 px-6 py-3 text-[11px] tracking-[0.18em] text-primary uppercase backdrop-blur-md"
-          style={{ boxShadow: "var(--shadow-gold)" }}
         >
           Get in touch
         </a>
