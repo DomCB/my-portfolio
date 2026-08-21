@@ -77,14 +77,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Christian Dominic Baraceros — QA & AI Automation" },
+      { title: "Christian Dominic Baraceros — QA & AI Process Automation" },
       {
         name: "description",
         content:
           "QA engineer with 3+ years owning the full software testing lifecycle across mobile and web products.",
       },
       { name: "author", content: "Christian Dominic Baraceros" },
-      { property: "og:title", content: "Christian Dominic Baraceros — QA & AI Automation" },
+      { property: "og:title", content: "Christian Dominic Baraceros — QA & AI Process Automation" },
       {
         property: "og:description",
         content: "Full-lifecycle QA across mobile and web. Test strategy, API testing, release validation.",

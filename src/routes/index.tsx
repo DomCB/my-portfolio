@@ -11,17 +11,17 @@ import { Projects } from "@/components/portfolio/Projects";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Christian Dominic Baraceros — QA & AI Automation" },
+      { title: "Christian Dominic Baraceros — QA & AI Process Automation" },
       {
         name: "description",
         content:
-          "Software QA Engineer and AI Automation Specialist in Taguig, Philippines. Full testing lifecycle ownership plus Make.com, n8n and Zapier automation.",
+          "Software QA Engineer and AI Process Automation Specialist in Taguig, Philippines. Full testing lifecycle ownership plus Make.com, n8n and Zapier process automation.",
       },
-      { property: "og:title", content: "Christian Dominic Baraceros — QA & AI Automation" },
+      { property: "og:title", content: "Christian Dominic Baraceros — QA & AI Process Automation" },
       {
         property: "og:description",
         content:
-          "Full-lifecycle QA across mobile and web, plus AI-powered workflow automation.",
+          "Full-lifecycle QA across mobile and web, plus AI-powered process automation.",
       },
     ],
   }),
@@ -39,7 +39,7 @@ const nav = [
 const aboutHighlights = [
   { title: "Full STLC ownership", subtitle: "Sprint planning through deployment.", Icon: ClipboardCheck },
   { title: "Defect lifecycle", subtitle: "Tracked to closure in Azure DevOps and Jira.", Icon: Bug },
-  { title: "Manual and AI-assisted QA", subtitle: "Claude and Gemini in testing process.", Icon: Sparkles },
+  { title: "Agentic testing with Claude", subtitle: "Claude agents accelerate test design, case creation, and exploratory runs.", Icon: Sparkles },
 ];
 
 const contactLinks = [
@@ -127,7 +127,7 @@ function Index() {
             <span className="text-gold-gradient font-normal">Baraceros</span>
           </h1>
           <div className="font-display mt-5 text-[15px] tracking-[0.05em] text-primary uppercase">
-            Software QA Engineer <span className="text-foreground">&amp;</span> AI Automation Specialist
+            Software QA Engineer <span className="text-foreground">&amp;</span> AI Process Automation Specialist
           </div>
           <p className="mt-4 max-w-md text-[16.5px] leading-relaxed text-muted-foreground">
             I own quality end-to-end and build AI workflows that do the busywork.
@@ -135,10 +135,10 @@ function Index() {
           <div className="mt-7 flex flex-wrap items-center gap-3">
             <span className="font-display text-[11px] tracking-[0.18em] text-muted-foreground uppercase">Open to</span>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-ring px-3.5 py-1.5 text-[12.5px] text-primary">
-              <span aria-hidden="true">✓</span> QA roles
+              <span aria-hidden="true">✓</span> Manual QA roles
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-ring px-3.5 py-1.5 text-[12.5px] text-primary">
-              <span aria-hidden="true">✓</span> AI Automation roles
+              <span aria-hidden="true">✓</span> AI Process Automation roles
             </span>
           </div>
           <div className="mt-8 flex flex-wrap gap-3.5">
@@ -156,7 +156,7 @@ function Index() {
             {[
               ["3+", "QA experience"],
               ["9+", "AI workflows built"],
-              ["3", "Automation platforms"],
+              ["3", "Process automation platforms"],
             ].map(([value, label]) => (
               <div key={label}>
                 <div className="font-display text-[26px] leading-none font-light text-primary">{value}</div>
@@ -204,9 +204,15 @@ function Index() {
             end to end.
           </h2>
           <p className="max-w-xl text-[17.5px] leading-relaxed text-foreground/85">
-            QA engineer working across <span className="text-primary">mobile and web</span> in Agile and Kanban
-            teams — test strategy, test design, defect tracking, regression and{" "}
-            <span className="text-primary">production release validation</span>.
+            A <span className="text-primary">manual QA specialist</span> working across mobile and web in
+            Agile and Kanban teams, covering test strategy, test design, defect tracking, regression and{" "}
+            <span className="text-primary">production release validation</span>. My focus is hands-on manual
+            end-to-end testing, and <span className="text-primary">Agentic testing using Claude/Gemini</span>.
+          </p>
+          <p className="mt-5 max-w-xl text-[16px] leading-relaxed text-foreground/70">
+            QA is my niche, and on the side, I work part-time as an{" "}
+            <span className="text-primary">AI Process Automation Specialist</span>, building AI-powered workflows in n8n,
+            Make.com, and Zapier that automate the repetitive busywork.
           </p>
         </div>
         <div className="flex flex-col gap-3.5">
@@ -246,7 +252,7 @@ function Index() {
               </div>
               <p className="mt-5 max-w-3xl text-[15px] leading-relaxed text-foreground/80">{job.summary}</p>
               <div className="font-display mt-6 text-[10px] tracking-[0.2em] text-muted-foreground uppercase">
-                Tools &amp; skills — hover or tap for detail
+                Tools &amp; skills, hover or tap for detail
               </div>
               <div className="mt-3 flex flex-wrap gap-2">
                 {job.tools.map((tool) => (
@@ -276,7 +282,7 @@ function Index() {
       <section id="projects" className="scroll-mt-16 border-t border-border px-6 py-24 md:px-15">
         <SectionLabel>Projects</SectionLabel>
         <h2 className="font-display mb-12 text-[clamp(1.9rem,3.4vw,2.75rem)] leading-tight font-extralight tracking-[-0.03em]">
-          AI automation builds
+          AI process automation builds
         </h2>
         <Projects />
       </section>
@@ -289,7 +295,7 @@ function Index() {
               BS Computer Engineering
             </h3>
             <div className="mt-2 text-[15px] text-muted-foreground">
-              Rizal Technological University — Mandaluyong
+              Rizal Technological University, Mandaluyong
             </div>
           </div>
           <div className="font-display text-[11px] tracking-[0.26em] text-primary uppercase">2018 — 2022</div>
