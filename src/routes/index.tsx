@@ -302,7 +302,7 @@ function Index() {
       >
         <SectionLabel>Contact</SectionLabel>
         <h2 className="font-display max-w-2xl text-[clamp(2rem,4.4vw,3.4rem)] leading-tight font-extralight tracking-[-0.03em]">
-          Want to talk about <span className="text-gold-gradient font-normal">Quality</span>? Or have
+          Want to talk about <span className="text-gold-gradient font-normal">Quality</span>? or have
           something to <span className="text-gold-gradient font-normal">Automate</span>?
         </h2>
         <div className="mt-10 flex flex-wrap gap-3.5">
