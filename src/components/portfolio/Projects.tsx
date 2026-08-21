@@ -95,6 +95,9 @@ function ProjectCard({ project, onOpen }: { project: Project; onOpen: (project: 
 
 const LENS_SIZE = 170;
 const LENS_ZOOM = 2.6;
+// Push the lens up-and-left of the pointer so the cursor/finger never sits over
+// the zoomed area. The pointer ends up just off the lens's bottom-right corner.
+const LENS_OFFSET = 24;
 
 function ProjectLightbox({ project, onClose }: { project: Project; onClose: () => void }) {
   const [lens, setLens] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
@@ -154,23 +157,31 @@ function ProjectLightbox({ project, onClose }: { project: Project; onClose: () =
             className="max-h-[78vh] w-auto max-w-full cursor-crosshair touch-none border border-ring object-contain"
             style={{ boxShadow: "var(--shadow-gold)" }}
           />
-          {lens && (
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute rounded-full border-2 border-ring"
-              style={{
-                left: lens.x - LENS_SIZE / 2,
-                top: lens.y - LENS_SIZE / 2,
-                width: LENS_SIZE,
-                height: LENS_SIZE,
-                backgroundImage: `url(${project.image})`,
-                backgroundRepeat: "no-repeat",
-                backgroundSize: `${lens.width * LENS_ZOOM}px ${lens.height * LENS_ZOOM}px`,
-                backgroundPosition: `${-(lens.x * LENS_ZOOM - LENS_SIZE / 2)}px ${-(lens.y * LENS_ZOOM - LENS_SIZE / 2)}px`,
-                boxShadow: "var(--shadow-gold), 0 0 0 4px color-mix(in oklab, var(--background) 75%, transparent)",
-              }}
-            />
-          )}
+          {lens && (() => {
+            // Real-loupe behaviour: the glass magnifies the image region directly
+            // beneath itself (its own centre), while the pointer/finger — sitting
+            // just off the lens's lower-right corner — only navigates it. The focal
+            // point is clamped to the image so the glass never magnifies empty space.
+            const focusX = Math.max(0, Math.min(lens.width, lens.x - LENS_SIZE / 2 - LENS_OFFSET));
+            const focusY = Math.max(0, Math.min(lens.height, lens.y - LENS_SIZE / 2 - LENS_OFFSET));
+            return (
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute rounded-full border-2 border-ring"
+                style={{
+                  left: lens.x - LENS_SIZE - LENS_OFFSET,
+                  top: lens.y - LENS_SIZE - LENS_OFFSET,
+                  width: LENS_SIZE,
+                  height: LENS_SIZE,
+                  backgroundImage: `url(${project.image})`,
+                  backgroundRepeat: "no-repeat",
+                  backgroundSize: `${lens.width * LENS_ZOOM}px ${lens.height * LENS_ZOOM}px`,
+                  backgroundPosition: `${-(focusX * LENS_ZOOM - LENS_SIZE / 2)}px ${-(focusY * LENS_ZOOM - LENS_SIZE / 2)}px`,
+                  boxShadow: "var(--shadow-gold), 0 0 0 4px color-mix(in oklab, var(--background) 75%, transparent)",
+                }}
+              />
+            );
+          })()}
         </div>
         <div className="mt-4 text-center">
           <div className="font-display text-[10px] tracking-[0.24em] text-primary uppercase">{project.category}</div>

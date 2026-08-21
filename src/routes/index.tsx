@@ -70,7 +70,16 @@ function SectionLabel({ children }: { children: string }) {
 
 function Index() {
   return (
-    <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
+    <div className="isolate min-h-screen overflow-x-hidden bg-background text-foreground">
+      {/* Ambient gold glow, pinned to the viewport — it stays put and shows behind every section as the page scrolls. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 -z-10"
+        style={{
+          background:
+            "radial-gradient(110% 80% at 4% -5%, color-mix(in oklab, var(--glow) var(--hero-glow-1), transparent), transparent 55%), radial-gradient(60% 65% at 84% 55%, color-mix(in oklab, var(--glow) var(--hero-glow-2), transparent), transparent 64%)",
+        }}
+      />
       <nav className="sticky top-0 z-60 flex items-center justify-between border-b border-border bg-background/80 px-6 py-3.5 backdrop-blur-xl md:px-15">
         <a href="#top" onClick={handleAnchorClick} className="shine flex items-center gap-3">
           <span className="font-display grid size-8 place-items-center border border-ring text-[12px] tracking-wide text-primary">
@@ -91,16 +100,13 @@ function Index() {
               </a>
             ))}
           </div>
-          <div className="flex items-center gap-3">
-            <ThemeToggle />
-            <a
-              href="#contact"
-              onClick={handleAnchorClick}
-              className="shine font-display border border-ring px-5 py-2.5 text-[11px] tracking-[0.18em] text-primary uppercase transition-colors hover:bg-accent"
-            >
-              Get in touch
-            </a>
-          </div>
+          <a
+            href="/BaracerosCD-Resume.pdf"
+            download
+            className="shine font-display inline-flex items-center gap-2 border border-ring px-5 py-2.5 text-[11px] tracking-[0.18em] text-primary uppercase transition-colors hover:bg-accent"
+          >
+            <Download size={13} strokeWidth={2} /> Resume
+          </a>
         </div>
       </nav>
 
@@ -108,13 +114,6 @@ function Index() {
         id="top"
         className="relative grid min-h-[640px] items-center gap-10 overflow-hidden px-6 pt-16 pb-4 md:grid-cols-[1.04fr_.96fr] md:px-15 md:pt-24 md:pb-20"
       >
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(110% 80% at 4% -5%, color-mix(in oklab, var(--glow) 13%, transparent), transparent 55%), radial-gradient(60% 65% at 84% 55%, color-mix(in oklab, var(--glow) 9%, transparent), transparent 64%), linear-gradient(180deg, var(--background), var(--surface) 52%, var(--background))",
-          }}
-        />
         <div className="relative max-w-xl [animation:rise_.9s_cubic-bezier(.2,.7,.3,1)_both]">
           <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-ring px-4 py-1.5">
             <span className="size-1.5 rounded-full bg-primary" />
@@ -151,20 +150,6 @@ function Index() {
             >
               View my work <span aria-hidden="true">↗</span>
             </a>
-            <a
-              href="#contact"
-              onClick={handleAnchorClick}
-              className="shine font-display rounded-full border border-ring px-8 py-4 text-[11.5px] tracking-[0.18em] text-primary uppercase transition-colors hover:bg-accent"
-            >
-              Get in touch
-            </a>
-            <a
-              href="/BaracerosCD-Resume.pdf"
-              download
-              className="shine font-display inline-flex items-center gap-2 rounded-full border border-ring px-8 py-4 text-[11.5px] tracking-[0.18em] text-primary uppercase transition-colors hover:bg-accent"
-            >
-              <Download size={14} strokeWidth={2} /> Resume
-            </a>
           </div>
           <div className="mt-10 h-px max-w-md bg-border" />
           <div className="mt-8 flex flex-wrap gap-8">
@@ -189,8 +174,8 @@ function Index() {
                 "radial-gradient(circle at 46% 38%, color-mix(in oklab, var(--glow) 24%, transparent), color-mix(in oklab, var(--glow) 7%, transparent) 55%, transparent 76%)",
             }}
           />
-          <div className="absolute top-[6%] left-[55%] h-[88%] w-[62%] -translate-x-1/2 rounded-t-[999px] border border-border bg-surface md:w-[52%] md:max-w-[250px]" />
-          <div className="absolute top-0 left-[45%] h-[94%] w-[70%] -translate-x-1/2 rounded-t-[999px] border border-ring md:w-[60%] md:max-w-[290px]" />
+          <div className="absolute top-[6%] left-[55%] h-[88%] w-[62%] -translate-x-1/2 rounded-t-[999px] border border-border bg-surface [animation:float-frame-a_7s_ease-in-out_infinite] md:w-[52%] md:max-w-[250px]" />
+          <div className="absolute top-0 left-[45%] h-[94%] w-[70%] -translate-x-1/2 rounded-t-[999px] border border-ring [animation:float-frame-b_5.5s_ease-in-out_infinite] md:w-[60%] md:max-w-[290px]" />
           <div
             className="absolute bottom-0 left-1/2 h-[86%] w-[54%] -translate-x-1/2 overflow-hidden rounded-t-[999px] border border-ring md:w-[46%] md:max-w-[220px]"
             style={{ boxShadow: "var(--shadow-gold)" }}
@@ -204,7 +189,7 @@ function Index() {
         </div>
       </section>
 
-      <section className="grid border-y border-border bg-surface sm:grid-cols-2 lg:grid-cols-4">
+      <section className="grid border-y border-border sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
           <StatCell key={stat.label} stat={stat} />
         ))}
@@ -314,15 +299,11 @@ function Index() {
       <section
         id="contact"
         className="scroll-mt-16 border-t border-border px-6 py-24 md:px-15"
-        style={{
-          background:
-            "radial-gradient(90% 70% at 12% 0%, color-mix(in oklab, var(--glow) 10%, transparent), transparent 60%), var(--background)",
-        }}
       >
         <SectionLabel>Contact</SectionLabel>
         <h2 className="font-display max-w-2xl text-[clamp(2rem,4.4vw,3.4rem)] leading-tight font-extralight tracking-[-0.03em]">
-          Want to talk about <span className="text-gold-gradient font-normal">Quality</span>? or want to{" "}
-          <span className="text-gold-gradient font-normal">Automate</span> something?
+          Want to talk about <span className="text-gold-gradient font-normal">Quality</span>? Or have
+          something to <span className="text-gold-gradient font-normal">Automate</span>?
         </h2>
         <div className="mt-10 flex flex-wrap gap-3.5">
           {contactLinks.map(({ label, href, external, Icon }) => (
@@ -340,12 +321,25 @@ function Index() {
         </div>
       </section>
 
-      <footer className="flex flex-wrap items-center justify-between gap-4 border-t border-border px-6 py-8 text-[12.5px] text-muted-foreground md:px-15">
+      <footer className="flex flex-wrap items-center justify-between gap-4 border-t border-border px-6 pt-8 pb-24 text-[12.5px] text-muted-foreground md:px-15">
         <span>© 2026 Christian Dominic Baraceros</span>
         <a href="#top" onClick={handleAnchorClick} className="shine transition-colors hover:text-primary">
           Back to top ↑
         </a>
       </footer>
+
+      {/* Floating controls: theme toggle + primary contact CTA, fixed to the lower-right corner. */}
+      <div className="fixed right-4 bottom-4 z-50 flex items-center gap-2.5 md:right-6 md:bottom-6">
+        <ThemeToggle />
+        <a
+          href="#contact"
+          onClick={handleAnchorClick}
+          className="shine-auto font-display border border-ring bg-surface/90 px-6 py-3 text-[11px] tracking-[0.18em] text-primary uppercase backdrop-blur-md"
+          style={{ boxShadow: "var(--shadow-gold)" }}
+        >
+          Get in touch
+        </a>
+      </div>
     </div>
   );
 }

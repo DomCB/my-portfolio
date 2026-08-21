@@ -90,6 +90,9 @@
   --gradient-gold: linear-gradient(102deg, var(--gold-soft), var(--primary) 40%, var(--gold-deep) 96%);
   --shadow-gold: 0 12px 36px oklch(0.585 0.108 78 / 0.24);
   --glow: oklch(0.585 0.108 78);
+  /* Ambient hero-glow strength — turned up in light mode so it reads against the near-white background. */
+  --hero-glow-1: 28%;
+  --hero-glow-2: 20%;
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -165,6 +168,32 @@
   }
 }
 
+/*
+ * Gentle vertical drift for the decorative gold arches around the hero photo.
+ * Uses `transform` only — the arches are centred with the `translate` property,
+ * so the two never collide. Two variants give the layers slightly different
+ * travel for an organic, barely-there float.
+ */
+@keyframes float-frame-a {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes float-frame-b {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.945 0.014 90);
@@ -187,6 +216,9 @@
   --gold-deep: oklch(0.58 0.098 82);
   --surface: oklch(0.175 0.003 85);
   --glow: oklch(0.762 0.121 85.5);
+  /* Dark-mode hero-glow strength — unchanged from the original tuning. */
+  --hero-glow-1: 13%;
+  --hero-glow-2: 9%;
   --shadow-gold: 0 12px 36px oklch(0.762 0.121 85.5 / 0.22);
   --sidebar: oklch(0.208 0.042 265.755);
   --sidebar-foreground: oklch(0.984 0.003 247.858);
@@ -229,6 +261,49 @@
   }
 }
 
+/*
+ * Glass-shine that sweeps on its own once every 3 minutes (no hover needed) —
+ * the same specular streak as the tool/skill chips, but self-triggering. The
+ * streak plays across the first ~0.85s of the 180s cycle, then rests until the
+ * next cycle.
+ */
+@keyframes shine-auto-sweep {
+  0% {
+    transform: translateX(-135%);
+  }
+  0.47%,
+  100% {
+    transform: translateX(135%);
+  }
+}
+
+@utility shine-auto {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      110deg,
+      transparent 20%,
+      color-mix(in oklab, var(--glow) 34%, transparent) 46%,
+      color-mix(in oklab, var(--glow) 8%, transparent) 58%,
+      transparent 74%
+    );
+    transform: translateX(-135%);
+    animation: shine-auto-sweep 180s linear infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shine-auto::after {
+    animation: none;
+  }
+}
+
 @utility no-scrollbar {
   scrollbar-width: none;
   &::-webkit-scrollbar {
@@ -251,12 +326,18 @@
   animation: diagonal-wipe 0.85s cubic-bezier(0.65, 0, 0.35, 1) both;
 }
 
+/*
+ * Diagonal wipe reveal for the theme toggle. The slant is expressed in vh
+ * (not %) so the leading edge keeps the same visual angle on any aspect
+ * ratio — a wide desktop viewport now wipes at the same clean diagonal as a
+ * tall phone instead of flattening into a near-horizontal sweep.
+ */
 @keyframes diagonal-wipe {
   from {
-    clip-path: polygon(-15% -15%, 0% -15%, -60% 115%, -75% 115%);
+    clip-path: polygon(-100vw 0, 0 0, -90vh 100vh, -100vw 100vh);
   }
   to {
-    clip-path: polygon(-15% -15%, 175% -15%, 115% 115%, -75% 115%);
+    clip-path: polygon(-100vw 0, calc(100vw + 180vh) 0, calc(100vw + 90vh) 100vh, -100vw 100vh);
   }
 }
 

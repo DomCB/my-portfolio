@@ -104,6 +104,15 @@ export const projects: Project[] = [
     steps: ["Webhook", "Google Docs", "Gemini agent + memory", "HTTP request", "Webhook response"],
   },
   {
+    category: "n8n",
+    title: "Google Drive File Sorter",
+    description:
+      "A new file dropped in a Drive folder is auto-sorted: a Switch routes it by type, Gemini reads image and PDF content (plain text is extracted directly), then an AI agent classifies it into one of seven folders and moves + renames it.",
+    image: "/projects/n8n-drive-file-sorter.png",
+    tags: ["n8n", "Gemini", "Google Drive"],
+    steps: ["Drive folder trigger", "Switch by file type", "Gemini analyze / extract", "AI agent classify", "Move + rename"],
+  },
+  {
     category: "Zapier",
     title: "Asana CRM Lead Engagement",
     description:
