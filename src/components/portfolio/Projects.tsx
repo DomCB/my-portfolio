@@ -95,12 +95,13 @@ function ProjectCard({ project, onOpen }: { project: Project; onOpen: (project: 
 
 const LENS_SIZE = 170;
 const LENS_ZOOM = 2.6;
-// Push the lens up-and-left of the pointer so the cursor/finger never sits over
-// the zoomed area. The pointer ends up just off the lens's bottom-right corner.
-const LENS_OFFSET = 24;
+// Mouse: SE circumference of the glass sits at the cursor (r/√2 from center at 45°).
+const LENS_CORNER = Math.round(LENS_SIZE / 2 / Math.SQRT2); // ≈ 60
+// Touch: glass floats directly above the finger with this gap.
+const LENS_TOUCH_GAP = 8;
 
 function ProjectLightbox({ project, onClose }: { project: Project; onClose: () => void }) {
-  const [lens, setLens] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
+  const [lens, setLens] = useState<{ x: number; y: number; width: number; height: number; touch: boolean } | null>(null);
   const imgRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
@@ -143,11 +144,11 @@ function ProjectLightbox({ project, onClose }: { project: Project; onClose: () =
             alt={project.title}
             onPointerMove={(e) => {
               const rect = e.currentTarget.getBoundingClientRect();
-              setLens({ x: e.clientX - rect.left, y: e.clientY - rect.top, width: rect.width, height: rect.height });
+              setLens({ x: e.clientX - rect.left, y: e.clientY - rect.top, width: rect.width, height: rect.height, touch: e.pointerType !== "mouse" });
             }}
             onPointerDown={(e) => {
               const rect = e.currentTarget.getBoundingClientRect();
-              setLens({ x: e.clientX - rect.left, y: e.clientY - rect.top, width: rect.width, height: rect.height });
+              setLens({ x: e.clientX - rect.left, y: e.clientY - rect.top, width: rect.width, height: rect.height, touch: e.pointerType !== "mouse" });
             }}
             onPointerUp={(e) => {
               if (e.pointerType !== "mouse") setLens(null);
@@ -158,19 +159,23 @@ function ProjectLightbox({ project, onClose }: { project: Project; onClose: () =
             style={{ boxShadow: "var(--shadow-gold)" }}
           />
           {lens && (() => {
-            // Real-loupe behaviour: the glass magnifies the image region directly
-            // beneath itself (its own centre), while the pointer/finger — sitting
-            // just off the lens's lower-right corner — only navigates it. The focal
-            // point is clamped to the image so the glass never magnifies empty space.
-            const focusX = Math.max(0, Math.min(lens.width, lens.x - LENS_SIZE / 2 - LENS_OFFSET));
-            const focusY = Math.max(0, Math.min(lens.height, lens.y - LENS_SIZE / 2 - LENS_OFFSET));
+            // Touch: glass floats directly above the finger, centred horizontally.
+            // Mouse: SE circumference of the glass sits at the cursor.
+            const lensLeft = lens.touch
+              ? lens.x - LENS_SIZE / 2
+              : lens.x - LENS_CORNER - LENS_SIZE / 2;
+            const lensTop = lens.touch
+              ? lens.y - LENS_SIZE - LENS_TOUCH_GAP
+              : lens.y - LENS_CORNER - LENS_SIZE / 2;
+            const focusX = Math.max(0, Math.min(lens.width, lens.touch ? lens.x : lens.x - LENS_CORNER));
+            const focusY = Math.max(0, Math.min(lens.height, lens.touch ? lens.y - LENS_SIZE / 2 - LENS_TOUCH_GAP : lens.y - LENS_CORNER));
             return (
               <div
                 aria-hidden="true"
                 className="pointer-events-none absolute rounded-full border-2 border-ring"
                 style={{
-                  left: lens.x - LENS_SIZE - LENS_OFFSET,
-                  top: lens.y - LENS_SIZE - LENS_OFFSET,
+                  left: lensLeft,
+                  top: lensTop,
                   width: LENS_SIZE,
                   height: LENS_SIZE,
                   backgroundImage: `url(${project.image})`,
