@@ -7,6 +7,7 @@ import { ToolChip } from "@/components/portfolio/ToolChip";
 import { StatCell } from "@/components/portfolio/StatCell";
 import { ThemeToggle } from "@/components/portfolio/ThemeToggle";
 import { Projects } from "@/components/portfolio/Projects";
+import { QAProjects } from "@/components/portfolio/QAProjects";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -32,7 +33,8 @@ const nav = [
   { href: "#about", label: "About" },
   { href: "#experience", label: "Experience" },
   { href: "#skills", label: "Skills" },
-  { href: "#projects", label: "Projects" },
+  { href: "#qa-projects", label: "QA Cases" },
+  { href: "#projects", label: "Automation" },
   { href: "#education", label: "Education" },
 ];
 
@@ -277,6 +279,16 @@ function Index() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section id="qa-projects" className="scroll-mt-16 border-t border-border px-6 py-24 md:px-15">
+        <SectionLabel>QA Case Studies</SectionLabel>
+        <h2 className="font-display mb-12 text-[clamp(1.9rem,3.4vw,2.75rem)] leading-tight font-extralight tracking-[-0.03em]">
+          Real projects, real bugs,
+          <br />
+          real lessons.
+        </h2>
+        <QAProjects />
       </section>
 
       <section id="projects" className="scroll-mt-16 border-t border-border px-6 py-24 md:px-15">

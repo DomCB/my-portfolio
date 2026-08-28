@@ -100,7 +100,17 @@ const LENS_CORNER = Math.round(LENS_SIZE / 2 / Math.SQRT2); // ≈ 60
 // Touch: glass floats directly above the finger with this gap.
 const LENS_TOUCH_GAP = 8;
 
-function ProjectLightbox({ project, onClose }: { project: Project; onClose: () => void }) {
+function ProjectLightbox({
+  project,
+  onClose,
+  onPrev,
+  onNext,
+}: {
+  project: Project;
+  onClose: () => void;
+  onPrev: () => void;
+  onNext: () => void;
+}) {
   const [lens, setLens] = useState<{ x: number; y: number; width: number; height: number; touch: boolean } | null>(null);
   const imgRef = useRef<HTMLImageElement>(null);
 
@@ -123,7 +133,7 @@ function ProjectLightbox({ project, onClose }: { project: Project; onClose: () =
       aria-modal="true"
       aria-label={project.title}
       onClick={onClose}
-      className="fixed inset-0 z-100 flex items-center justify-center bg-background/80 p-6 backdrop-blur-md [animation:soften_.2s_ease_both] md:p-12"
+      className="fixed inset-0 z-100 flex items-center justify-center bg-background/80 p-4 backdrop-blur-md [animation:soften_.2s_ease_both] md:p-10"
     >
       <button
         type="button"
@@ -133,11 +143,31 @@ function ProjectLightbox({ project, onClose }: { project: Project; onClose: () =
       >
         ✕
       </button>
+
+      <button
+        type="button"
+        onClick={(e) => { e.stopPropagation(); onPrev(); }}
+        aria-label="Previous project"
+        className="shine font-display fixed left-4 top-1/2 -translate-y-1/2 grid size-14 place-items-center border border-ring bg-surface/90 text-[26px] text-primary backdrop-blur-sm transition-colors hover:bg-accent md:left-6"
+      >
+        ‹
+      </button>
+      <button
+        type="button"
+        onClick={(e) => { e.stopPropagation(); onNext(); }}
+        aria-label="Next project"
+        className="shine font-display fixed right-4 top-1/2 -translate-y-1/2 grid size-14 place-items-center border border-ring bg-surface/90 text-[26px] text-primary backdrop-blur-sm transition-colors hover:bg-accent md:right-6"
+      >
+        ›
+      </button>
+
       <div
         onClick={(e) => e.stopPropagation()}
-        className="flex max-h-full max-w-4xl flex-col [animation:rise_.25s_cubic-bezier(.2,.7,.3,1)_both]"
+        className="flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden border border-ring [animation:rise_.25s_cubic-bezier(.2,.7,.3,1)_both]"
+        style={{ boxShadow: "var(--shadow-gold)" }}
       >
-        <div className="relative inline-block">
+        {/* Image with magnifier */}
+        <div className="relative shrink-0 bg-background">
           <img
             ref={imgRef}
             src={project.image}
@@ -155,12 +185,9 @@ function ProjectLightbox({ project, onClose }: { project: Project; onClose: () =
             }}
             onPointerLeave={() => setLens(null)}
             onPointerCancel={() => setLens(null)}
-            className="max-h-[78vh] w-auto max-w-full cursor-crosshair touch-none border border-ring object-contain"
-            style={{ boxShadow: "var(--shadow-gold)" }}
+            className="max-h-[52vh] w-full cursor-crosshair touch-none border-b border-ring object-contain"
           />
           {lens && (() => {
-            // Touch: glass floats directly above the finger, centred horizontally.
-            // Mouse: SE circumference of the glass sits at the cursor.
             const lensLeft = lens.touch
               ? lens.x - LENS_SIZE / 2
               : lens.x - LENS_CORNER - LENS_SIZE / 2;
@@ -188,9 +215,52 @@ function ProjectLightbox({ project, onClose }: { project: Project; onClose: () =
             );
           })()}
         </div>
-        <div className="mt-4 text-center">
-          <div className="font-display text-[10px] tracking-[0.24em] text-primary uppercase">{project.category}</div>
-          <h3 className="font-display mt-1.5 text-[17px] text-foreground">{project.title}</h3>
+
+        {/* Scrollable info panel */}
+        <div className="overflow-y-auto bg-surface/95 backdrop-blur-sm">
+          <div className="border-b border-border px-6 py-5">
+            <div className="font-display text-[10px] tracking-[0.24em] text-primary uppercase">{project.category}</div>
+            <h3 className="font-display mt-1.5 text-[18px] text-foreground">{project.title}</h3>
+          </div>
+
+          <div className="space-y-6 px-6 py-6">
+            <div>
+              <div className="font-display mb-2 text-[10px] tracking-[0.22em] text-primary uppercase">Description</div>
+              <p className="text-[14px] leading-relaxed text-foreground/80">{project.description}</p>
+            </div>
+
+            {project.process && (
+              <div>
+                <div className="font-display mb-3 text-[10px] tracking-[0.22em] text-primary uppercase">High-Level Process</div>
+                <div className="flex flex-wrap items-center gap-y-2">
+                  {project.process.map((step, i) => (
+                    <span key={step} className="flex items-center gap-2">
+                      <span className="text-[13px] leading-relaxed text-foreground/75">{step}</span>
+                      {i < (project.process?.length ?? 0) - 1 && (
+                        <span className="font-display text-primary/60 mx-1">→</span>
+                      )}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {project.tags && (
+              <div>
+                <div className="font-display mb-3 text-[10px] tracking-[0.22em] text-primary uppercase">Tools</div>
+                <div className="flex flex-wrap gap-2 pb-1">
+                  {project.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="shine font-display inline-block rounded-full border border-primary/60 bg-accent/40 px-3.5 py-2 text-[12px] tracking-[0.01em] text-primary/85 transition-colors hover:border-primary hover:text-primary"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -199,7 +269,8 @@ function ProjectLightbox({ project, onClose }: { project: Project; onClose: () =
 
 export function Projects() {
   const [category, setCategory] = useState<(typeof categories)[number]>("n8n");
-  const [active, setActive] = useState<Project | null>(null);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const active = activeIndex !== null ? projects[activeIndex] : null;
   const scrollerRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
   // After a tab change, where to land the scroller: fresh tab starts at the left,
@@ -263,47 +334,27 @@ export function Projects() {
 
   return (
     <div ref={sectionRef}>
-      <div className="mb-8 flex flex-wrap items-center justify-between gap-6">
-        <div className="flex flex-wrap gap-2">
-          {categories.map((cat) => {
-            const count = projects.filter((p) => p.category === cat).length;
-            return (
-              <button
-                key={cat}
-                type="button"
-                onClick={() => setCategory(cat)}
-                className={`shine font-display inline-flex items-center gap-2 border px-4 py-2 text-[10.5px] tracking-[0.18em] uppercase transition-colors ${
-                  category === cat
-                    ? "border-ring bg-accent text-primary"
-                    : "border-border text-muted-foreground hover:border-ring hover:text-primary"
-                }`}
-              >
-                {cat}
-                <span className="grid size-4 place-items-center rounded-full border border-current text-[9px] normal-case">
-                  {count}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            aria-label="Previous projects"
-            className="shine font-display grid size-10 place-items-center border border-ring text-primary transition-colors hover:bg-accent"
-          >
-            ‹
-          </button>
-          <button
-            type="button"
-            onClick={() => navigate(1)}
-            aria-label="Next projects"
-            className="shine font-display grid size-10 place-items-center border border-ring text-primary transition-colors hover:bg-accent"
-          >
-            ›
-          </button>
-        </div>
+      <div className="mb-8 flex flex-wrap gap-2">
+        {categories.map((cat) => {
+          const count = projects.filter((p) => p.category === cat).length;
+          return (
+            <button
+              key={cat}
+              type="button"
+              onClick={() => setCategory(cat)}
+              className={`shine font-display inline-flex items-center gap-2 border px-4 py-2 text-[10.5px] tracking-[0.18em] uppercase transition-colors ${
+                category === cat
+                  ? "border-ring bg-accent text-primary"
+                  : "border-border text-muted-foreground hover:border-ring hover:text-primary"
+              }`}
+            >
+              {cat}
+              <span className="grid size-4 place-items-center rounded-full border border-current text-[9px] normal-case">
+                {count}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       {categoryDescriptions[category] && (
@@ -312,13 +363,38 @@ export function Projects() {
         </p>
       )}
 
-      <div ref={scrollerRef} className="no-scrollbar flex gap-5 overflow-x-auto scroll-smooth pb-2 snap-x snap-mandatory">
-        {filtered.map((project) => (
-          <ProjectCard key={project.title} project={project} onOpen={setActive} />
-        ))}
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          aria-label="Previous projects"
+          className="shine font-display absolute top-1/2 -left-5 z-10 grid size-10 -translate-y-1/2 place-items-center border border-ring bg-surface text-primary transition-colors hover:bg-accent"
+        >
+          ‹
+        </button>
+        <div ref={scrollerRef} className="no-scrollbar flex gap-5 overflow-x-auto scroll-smooth pb-2 snap-x snap-mandatory px-1">
+          {filtered.map((project) => (
+            <ProjectCard key={project.title} project={project} onOpen={(p) => setActiveIndex(projects.indexOf(p))} />
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={() => navigate(1)}
+          aria-label="Next projects"
+          className="shine font-display absolute top-1/2 -right-5 z-10 grid size-10 -translate-y-1/2 place-items-center border border-ring bg-surface text-primary transition-colors hover:bg-accent"
+        >
+          ›
+        </button>
       </div>
 
-      {active && <ProjectLightbox project={active} onClose={() => setActive(null)} />}
+      {active && (
+        <ProjectLightbox
+          project={active}
+          onClose={() => setActiveIndex(null)}
+          onPrev={() => setActiveIndex((i) => i !== null ? (i - 1 + projects.length) % projects.length : null)}
+          onNext={() => setActiveIndex((i) => i !== null ? (i + 1) % projects.length : null)}
+        />
+      )}
     </div>
   );
 }
