@@ -52,7 +52,6 @@ function QALightbox({
   const hasImages = project.images.length > 0;
   const hasMultiple = project.images.length > 1;
   const infoRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     setImgIndex(0);
     infoRef.current?.scrollTo({ top: 0 });
@@ -83,21 +82,12 @@ function QALightbox({
       onClick={onClose}
       className="fixed inset-0 z-100 flex items-center justify-center bg-background/80 p-4 backdrop-blur-md [animation:soften_.2s_ease_both] md:p-10"
     >
-      <button
-        type="button"
-        onClick={onClose}
-        aria-label="Close preview"
-        className="shine font-display fixed top-5 right-5 grid size-11 place-items-center border border-ring bg-surface text-primary transition-colors hover:bg-accent"
-      >
-        ✕
-      </button>
-
-      {/* Project navigation — switch between projects */}
+      {/* Project nav arrows — visible on all screen sizes */}
       <button
         type="button"
         onClick={(e) => { e.stopPropagation(); onPrev(); }}
         aria-label="Previous project"
-        className="shine font-display fixed left-4 top-1/2 -translate-y-1/2 grid size-14 place-items-center border border-ring bg-surface/90 text-[26px] text-primary backdrop-blur-sm transition-colors hover:bg-accent md:left-6"
+        className="shine font-display fixed left-2 top-[62%] z-10 grid size-12 -translate-y-1/2 place-items-center border border-ring/60 bg-transparent text-[22px] text-primary transition-colors hover:bg-accent/60 md:left-4 md:top-1/2 md:size-14 md:border-ring md:bg-surface/90 md:text-[26px] md:backdrop-blur-sm"
       >
         ‹
       </button>
@@ -105,16 +95,25 @@ function QALightbox({
         type="button"
         onClick={(e) => { e.stopPropagation(); onNext(); }}
         aria-label="Next project"
-        className="shine font-display fixed right-4 top-1/2 -translate-y-1/2 grid size-14 place-items-center border border-ring bg-surface/90 text-[26px] text-primary backdrop-blur-sm transition-colors hover:bg-accent md:right-6"
+        className="shine font-display fixed right-2 top-[62%] z-10 grid size-12 -translate-y-1/2 place-items-center border border-ring/60 bg-transparent text-[22px] text-primary transition-colors hover:bg-accent/60 md:right-4 md:top-1/2 md:size-14 md:border-ring md:bg-surface/90 md:text-[26px] md:backdrop-blur-sm"
       >
         ›
       </button>
 
       <div
         onClick={(e) => e.stopPropagation()}
-        className="flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden border border-ring [animation:rise_.25s_cubic-bezier(.2,.7,.3,1)_both]"
+        className="relative flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden border border-ring [animation:rise_.25s_cubic-bezier(.2,.7,.3,1)_both]"
         style={{ boxShadow: "var(--shadow-gold)" }}
       >
+        {/* Close button inside dialog */}
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close preview"
+          className="shine font-display absolute top-3 right-3 z-20 grid size-10 place-items-center border border-ring bg-surface/90 text-primary backdrop-blur-sm transition-colors hover:bg-accent"
+        >
+          ✕
+        </button>
         {/* Image area */}
         <div className="relative shrink-0 bg-background">
           {hasImages ? (
@@ -126,13 +125,15 @@ function QALightbox({
               />
               {hasMultiple && (
                 <>
+                  {/* Borderless photo arrows */}
                   <button
                     type="button"
                     onClick={() =>
                       setImgIndex((i) => (i - 1 + project.images.length) % project.images.length)
                     }
                     aria-label="Previous image"
-                    className="shine font-display absolute top-1/2 left-3 grid size-12 -translate-y-1/2 place-items-center bg-surface/80 text-[22px] text-primary backdrop-blur-sm transition-colors hover:bg-accent"
+                    className="absolute top-1/2 left-2 grid size-12 -translate-y-1/2 place-items-center text-[28px] text-white/80 transition-opacity hover:text-white"
+                    style={{ textShadow: "0 1px 8px rgba(0,0,0,0.7)" }}
                   >
                     ‹
                   </button>
@@ -140,7 +141,8 @@ function QALightbox({
                     type="button"
                     onClick={() => setImgIndex((i) => (i + 1) % project.images.length)}
                     aria-label="Next image"
-                    className="shine font-display absolute top-1/2 right-3 grid size-12 -translate-y-1/2 place-items-center bg-surface/80 text-[22px] text-primary backdrop-blur-sm transition-colors hover:bg-accent"
+                    className="absolute top-1/2 right-2 grid size-12 -translate-y-1/2 place-items-center text-[28px] text-white/80 transition-opacity hover:text-white"
+                    style={{ textShadow: "0 1px 8px rgba(0,0,0,0.7)" }}
                   >
                     ›
                   </button>
