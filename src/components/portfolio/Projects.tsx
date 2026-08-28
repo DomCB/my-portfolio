@@ -185,7 +185,7 @@ function ProjectLightbox({
             }}
             onPointerLeave={() => setLens(null)}
             onPointerCancel={() => setLens(null)}
-            className="max-h-[52vh] w-full cursor-crosshair touch-none border-b border-ring object-contain"
+            className="h-[38vh] w-full cursor-crosshair touch-none border-b border-ring object-contain sm:h-[48vh]"
           />
           {lens && (() => {
             const lensLeft = lens.touch
@@ -217,7 +217,7 @@ function ProjectLightbox({
         </div>
 
         {/* Scrollable info panel */}
-        <div className="overflow-y-auto bg-surface/95 backdrop-blur-sm">
+        <div className="flex-1 min-h-0 overflow-y-auto bg-surface/95 backdrop-blur-sm">
           <div className="border-b border-border px-6 py-5">
             <div className="font-display text-[10px] tracking-[0.24em] text-primary uppercase">{project.category}</div>
             <h3 className="font-display mt-1.5 text-[18px] text-foreground">{project.title}</h3>

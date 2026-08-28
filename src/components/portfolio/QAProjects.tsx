@@ -122,7 +122,7 @@ function QALightbox({
               <img
                 src={project.images[imgIndex]}
                 alt={`${project.title} — screenshot ${imgIndex + 1} of ${project.images.length}`}
-                className="max-h-[52vh] w-full border-b border-ring object-contain"
+                className="h-[38vh] w-full border-b border-ring object-contain sm:h-[48vh]"
               />
               {hasMultiple && (
                 <>
@@ -161,7 +161,7 @@ function QALightbox({
               )}
             </>
           ) : (
-            <div className="flex h-[180px] w-full items-center justify-center border-b border-ring bg-background">
+            <div className="flex h-[38vh] w-full items-center justify-center border-b border-ring bg-background sm:h-[48vh]">
               <span className="font-display text-[11px] tracking-[0.22em] text-muted-foreground uppercase">
                 Screenshots coming soon
               </span>
@@ -170,7 +170,7 @@ function QALightbox({
         </div>
 
         {/* Scrollable info panel */}
-        <div ref={infoRef} className="overflow-y-auto bg-surface/95 backdrop-blur-sm">
+        <div ref={infoRef} className="flex-1 min-h-0 overflow-y-auto bg-surface/95 backdrop-blur-sm">
           <div className="border-b border-border px-6 py-5">
             <div className="font-display text-[10px] tracking-[0.24em] text-primary uppercase">
               {project.category}
