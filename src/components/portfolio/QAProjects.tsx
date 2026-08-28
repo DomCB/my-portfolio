@@ -246,11 +246,17 @@ export function QAProjects() {
     setActiveIndex(qaProjects.indexOf(project));
   };
 
-  const navigate = (dir: 1 | -1) => {
+  const navigateLightbox = (dir: 1 | -1) => {
     setActiveIndex((i) => {
       if (i === null) return null;
       return (i + dir + qaProjects.length) % qaProjects.length;
     });
+  };
+
+  const scrollCarousel = (dir: 1 | -1) => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    el.scrollBy({ left: dir * Math.min(el.clientWidth * 0.9, 360), behavior: "smooth" });
   };
 
   return (
@@ -281,21 +287,39 @@ export function QAProjects() {
         })}
       </div>
 
-      <div
-        ref={scrollerRef}
-        className="no-scrollbar flex gap-5 overflow-x-auto scroll-smooth pb-2 snap-x snap-mandatory"
-      >
-        {filtered.map((project) => (
-          <QAProjectCard key={project.title} project={project} onOpen={openProject} />
-        ))}
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => scrollCarousel(-1)}
+          aria-label="Previous QA project"
+          className="shine font-display absolute top-1/2 -left-5 z-10 grid size-10 -translate-y-1/2 place-items-center border border-ring bg-surface text-primary transition-colors hover:bg-accent"
+        >
+          ‹
+        </button>
+        <div
+          ref={scrollerRef}
+          className="no-scrollbar flex gap-5 overflow-x-auto scroll-smooth pb-2 snap-x snap-mandatory px-1"
+        >
+          {filtered.map((project) => (
+            <QAProjectCard key={project.title} project={project} onOpen={openProject} />
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={() => scrollCarousel(1)}
+          aria-label="Next QA project"
+          className="shine font-display absolute top-1/2 -right-5 z-10 grid size-10 -translate-y-1/2 place-items-center border border-ring bg-surface text-primary transition-colors hover:bg-accent"
+        >
+          ›
+        </button>
       </div>
 
       {active && (
         <QALightbox
           project={active}
           onClose={() => setActiveIndex(null)}
-          onPrev={() => navigate(-1)}
-          onNext={() => navigate(1)}
+          onPrev={() => navigateLightbox(-1)}
+          onNext={() => navigateLightbox(1)}
         />
       )}
     </div>
