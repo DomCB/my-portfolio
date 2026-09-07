@@ -253,10 +253,11 @@ export function QAProjects() {
     });
   };
 
-  const scrollCarousel = (dir: 1 | -1) => {
-    const el = scrollerRef.current;
-    if (!el) return;
-    el.scrollBy({ left: dir * Math.min(el.clientWidth * 0.9, 360), behavior: "smooth" });
+  const navigateCategory = (dir: 1 | -1) => {
+    const currentIndex = qaCategories.indexOf(category);
+    const nextIndex = (currentIndex + dir + qaCategories.length) % qaCategories.length;
+    setCategory(qaCategories[nextIndex]);
+    scrollerRef.current?.scrollTo({ left: 0, behavior: "smooth" });
   };
 
   return (
@@ -290,7 +291,7 @@ export function QAProjects() {
       <div className="relative">
         <button
           type="button"
-          onClick={() => scrollCarousel(-1)}
+          onClick={() => navigateCategory(-1)}
           aria-label="Previous QA project"
           className="shine font-display absolute top-1/2 -left-5 z-10 grid size-10 -translate-y-1/2 place-items-center border border-ring bg-surface text-primary transition-colors hover:bg-accent"
         >
@@ -306,7 +307,7 @@ export function QAProjects() {
         </div>
         <button
           type="button"
-          onClick={() => scrollCarousel(1)}
+          onClick={() => navigateCategory(1)}
           aria-label="Next QA project"
           className="shine font-display absolute top-1/2 -right-5 z-10 grid size-10 -translate-y-1/2 place-items-center border border-ring bg-surface text-primary transition-colors hover:bg-accent"
         >
