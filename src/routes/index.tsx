@@ -145,7 +145,7 @@ function Index() {
           </div>
           <div className="mt-8 flex flex-wrap gap-3.5">
             <a
-              href="#projects"
+              href="#qa-projects"
               onClick={handleAnchorClick}
               className="shine bg-gold-gradient font-display inline-flex items-center gap-2 rounded-full px-8 py-4 text-[11.5px] font-semibold tracking-[0.18em] text-primary-foreground uppercase transition-shadow"
               style={{ boxShadow: "var(--shadow-gold)" }}
