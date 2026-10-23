@@ -1,4 +1,5 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import { Flame } from "lucide-react";
 import { projects, type Project } from "./data";
 
 // useLayoutEffect warns during SSR; fall back to useEffect on the server.
@@ -12,9 +13,9 @@ const categoryDescriptions: Partial<Record<(typeof categories)[number], string>>
   "Make.com": "Visual, multi-branch scenarios with routers, iterators, and aggregators.",
 };
 
-function TerminalChrome({ locked }: { locked?: boolean }) {
+function TerminalChrome({ locked, hot }: { locked?: boolean; hot?: boolean | undefined }) {
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex h-5 items-center justify-between">
       <div className="flex gap-1.5">
         <span className={`size-2.5 rounded-full ${locked ? "bg-muted-foreground/30" : "bg-red-500/70"}`} />
         <span className={`size-2.5 rounded-full ${locked ? "bg-muted-foreground/30" : "bg-yellow-500/70"}`} />
@@ -26,11 +27,25 @@ function TerminalChrome({ locked }: { locked?: boolean }) {
           locked
         </div>
       )}
+      {hot && (
+        <div className="font-display flex items-center gap-1 rounded-full border border-orange-500/60 bg-orange-500/10 px-2 py-0.5 text-[10px] tracking-[0.14em] text-orange-400 uppercase">
+          <Flame size={12} strokeWidth={2} className="fill-orange-500/40" aria-hidden="true" />
+          Hot!
+        </div>
+      )}
     </div>
   );
 }
 
-function ProjectCard({ project, onOpen }: { project: Project; onOpen: (project: Project) => void }) {
+function ProjectCard({
+  project,
+  onOpen,
+  shineDelay,
+}: {
+  project: Project;
+  onOpen: (project: Project) => void;
+  shineDelay?: string | undefined;
+}) {
   if (project.locked) {
     return (
       <article className="relative flex w-[300px] shrink-0 snap-start flex-col border border-border bg-surface opacity-80 sm:w-[340px]">
@@ -67,10 +82,11 @@ function ProjectCard({ project, onOpen }: { project: Project; onOpen: (project: 
     <button
       type="button"
       onClick={() => onOpen(project)}
-      className="shine group flex w-[300px] shrink-0 snap-start flex-col border border-border bg-surface text-left transition-colors hover:border-ring sm:w-[340px]"
+      style={shineDelay ? ({ "--shine-delay": shineDelay } as CSSProperties) : undefined}
+      className={`${project.featured ? "shine-soft border-ring/50" : "shine border-border"} group flex w-[300px] shrink-0 snap-start flex-col border bg-surface text-left transition-colors hover:border-ring sm:w-[340px]`}
     >
       <div className="border-b border-border bg-background px-4 py-4 transition-colors group-hover:bg-accent/20">
-        <TerminalChrome />
+        <TerminalChrome hot={project.hot} />
         <div className="mt-4 flex flex-col gap-2">
           {project.steps?.map((step, i) => (
             <div key={step} className="flex items-center gap-2 font-mono text-[11px]">
@@ -113,9 +129,19 @@ function ProjectLightbox({
 }) {
   const [lens, setLens] = useState<{ x: number; y: number; width: number; height: number; touch: boolean } | null>(null);
   const imgRef = useRef<HTMLImageElement>(null);
+  const gallery = project.images ?? (project.image ? [project.image] : []);
+  const hasMultiple = gallery.length > 1;
+  const [imgIndex, setImgIndex] = useState(0);
+  const src = gallery[imgIndex];
+  useEffect(() => {
+    setImgIndex(0);
+  }, [project]);
+
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
+      if (e.key === "ArrowLeft" && hasMultiple) setImgIndex((i) => (i - 1 + gallery.length) % gallery.length);
+      if (e.key === "ArrowRight" && hasMultiple) setImgIndex((i) => (i + 1) % gallery.length);
     };
     document.addEventListener("keydown", onKeyDown);
     const prevOverflow = document.body.style.overflow;
@@ -124,7 +150,7 @@ function ProjectLightbox({
       document.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = prevOverflow;
     };
-  }, [onClose]);
+  }, [onClose, hasMultiple, gallery.length]);
 
   return (
     <div
@@ -167,11 +193,12 @@ function ProjectLightbox({
           ✕
         </button>
         {/* Image with magnifier */}
+        {src && (
         <div className="relative shrink-0 bg-background">
           <img
             ref={imgRef}
-            src={project.image}
-            alt={project.title}
+            src={src}
+            alt={hasMultiple ? `${project.title} — image ${imgIndex + 1} of ${gallery.length}` : project.title}
             onPointerMove={(e) => {
               const rect = e.currentTarget.getBoundingClientRect();
               setLens({ x: e.clientX - rect.left, y: e.clientY - rect.top, width: rect.width, height: rect.height, touch: e.pointerType !== "mouse" });
@@ -205,7 +232,7 @@ function ProjectLightbox({
                   top: lensTop,
                   width: LENS_SIZE,
                   height: LENS_SIZE,
-                  backgroundImage: `url(${project.image})`,
+                  backgroundImage: `url(${src})`,
                   backgroundRepeat: "no-repeat",
                   backgroundSize: `${lens.width * LENS_ZOOM}px ${lens.height * LENS_ZOOM}px`,
                   backgroundPosition: `${-(focusX * LENS_ZOOM - LENS_SIZE / 2)}px ${-(focusY * LENS_ZOOM - LENS_SIZE / 2)}px`,
@@ -214,7 +241,42 @@ function ProjectLightbox({
               />
             );
           })()}
+          {hasMultiple && (
+            <>
+              {/* Borderless photo arrows */}
+              <button
+                type="button"
+                onClick={() => setImgIndex((i) => (i - 1 + gallery.length) % gallery.length)}
+                aria-label="Previous image"
+                className="absolute top-1/2 left-2 grid size-12 -translate-y-1/2 place-items-center text-[28px] text-white/80 transition-opacity hover:text-white"
+                style={{ textShadow: "0 1px 8px rgba(0,0,0,0.7)" }}
+              >
+                ‹
+              </button>
+              <button
+                type="button"
+                onClick={() => setImgIndex((i) => (i + 1) % gallery.length)}
+                aria-label="Next image"
+                className="absolute top-1/2 right-2 grid size-12 -translate-y-1/2 place-items-center text-[28px] text-white/80 transition-opacity hover:text-white"
+                style={{ textShadow: "0 1px 8px rgba(0,0,0,0.7)" }}
+              >
+                ›
+              </button>
+              <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
+                {gallery.map((_, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setImgIndex(i)}
+                    aria-label={`Go to image ${i + 1}`}
+                    className={`size-2 rounded-full transition-colors ${i === imgIndex ? "bg-primary" : "bg-white/40"}`}
+                  />
+                ))}
+              </div>
+            </>
+          )}
         </div>
+        )}
 
         {/* Scrollable info panel */}
         <div className="flex-1 min-h-0 overflow-y-auto bg-surface/95 backdrop-blur-sm">
@@ -373,9 +435,18 @@ export function Projects() {
           ‹
         </button>
         <div ref={scrollerRef} className="no-scrollbar flex gap-5 overflow-x-auto scroll-smooth pb-2 snap-x snap-mandatory px-1">
-          {filtered.map((project) => (
-            <ProjectCard key={project.title} project={project} onOpen={(p) => setActiveIndex(projects.indexOf(p))} />
-          ))}
+          {filtered.map((project) => {
+            // Featured cards take turns: each one sweeps half a cycle (3s of 6s) after the previous.
+            const featuredIndex = filtered.filter((p) => p.featured).indexOf(project);
+            return (
+              <ProjectCard
+                key={project.title}
+                project={project}
+                onOpen={(p) => setActiveIndex(projects.indexOf(p))}
+                shineDelay={featuredIndex > 0 ? `${featuredIndex * 3}s` : undefined}
+              />
+            );
+          })}
         </div>
         <button
           type="button"

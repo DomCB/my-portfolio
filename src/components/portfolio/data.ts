@@ -61,10 +61,13 @@ export type Project = {
   title: string;
   description: string;
   image?: string;
+  images?: string[];
   tags?: string[];
   steps?: string[];
   process?: string[];
   locked?: boolean;
+  featured?: boolean;
+  hot?: boolean;
 };
 
 export type QAProject = {
@@ -166,6 +169,18 @@ export const qaProjects: QAProject[] = [
 export const projects: Project[] = [
   {
     category: "n8n",
+    title: "Azure DevOps Meeting → Task Sync",
+    description:
+      "Every 10 minutes on workdays, today's calendar invites are mirrored into Azure DevOps as sprint Test Tasks: accepted meetings go Active, tentative ones New, and declined ones are removed, so meeting hours are logged automatically.",
+    images: ["/projects/n8n-azure-devops-task-sync.png", "/projects/n8n-azure-devops-task-sync-flow.png"],
+    tags: ["n8n", "Google Calendar", "Azure DevOps"],
+    steps: ["Schedule trigger", "Google Calendar", "Switch by RSVP", "Azure DevOps WIQL lookup", "Create / update / remove"],
+    process: ["Scheduled trigger (every 10 min, weekdays)", "Fetch today's invites from Google Calendar", "Branch by RSVP: accepted / tentative / declined", "Find current iteration + parent user story via WIQL", "Create, re-time or remove the matching Test Task"],
+    featured: true,
+    hot: true,
+  },
+  {
+    category: "n8n",
     title: "AI Receptionist",
     description:
       "A Vapi voice agent checks calendar availability, books, updates or cancels appointments, and logs every call outcome to Airtable in real time.",
@@ -173,6 +188,8 @@ export const projects: Project[] = [
     tags: ["n8n", "Google Calendar", "Airtable"],
     steps: ["Webhook (Vapi call)", "Check availability", "Google Calendar", "Airtable log", "Respond to call"],
     process: ["Receive Vapi voice call", "Check Google Calendar availability", "Create / update / cancel event", "Log booking to Airtable", "Respond to caller"],
+    featured: true,
+    hot: true,
   },
   {
     category: "n8n",
